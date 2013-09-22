@@ -2,21 +2,21 @@
 #include<Windows.h>
 #include<stdlib.h>
 #include<string.h>
-#include "job_interview_1.h"
 #include <stdint.h>
 #include <math.h>
+#include "job_interview_1.h"
 #include "queue1.h"
 #include "main_program.h"
 
 /**********************************************************************************
-* this program contacts the server, recieves a challenge,                         *
+* this program contacts the server, receives a challenge,                         *
 then sends the length of email,email and md5 hash code of challenge+email         *
-in order to receive back from the server an information on a binary tree          *
-from the tree, the program draw's a picture (integrity project logo               *             
+in order to receive back from the server an information on a binary tree.         *
+Using the tree, the program draws a picture (integrity project logo               *             
 written by hod gavriel                                                            *
 **********************************************************************************/
 
-/***methods***/
+/***********methods************/
 
 
 //insert a node at the beginning of the Linked List
@@ -24,17 +24,15 @@ void push(struct ListNode** head_ref, node_data_t* node1)
 {
     // allocate node and assign data
     ListNode* new_node = (ListNode*)malloc(sizeof(ListNode));
-	if (node1 == NULL) {
+	 if (node1 == NULL) {
 		return;
 	}
-	
 
 	new_node->node = node1;
-	
- 
+
     // link the old list off the new node
     new_node->next = (*head_ref);
- 
+
     // move the head to point to the new node
     (*head_ref)    = new_node;
 }
@@ -57,13 +55,9 @@ node_t* newBinaryTreeNode(node_data_t* node1)
 // insert the data to the nodes in preorder
 void preorderTraversal(node_t* root, void* dataBUFFER, int* index)
 {
-    if (root)
+    if (root!=NULL)
     {
-
-		for (int i=0;i<root->data->len;i++) {
-			root->data->data[i]=* ( (unsigned char*)dataBUFFER+*index+i);
-
-		}
+	    memcpy(root->data->data,(unsigned char*)dataBUFFER+*index,root->data->len);
 		*index=*index+root->data->len;
 		preorderTraversal(root->l, dataBUFFER, index);
         preorderTraversal(root->r, dataBUFFER, index);
@@ -79,7 +73,7 @@ int convertToNum(int *arr) {
 	for (int i=0;i<4;i++) {
 		if ( arr[i]==-1) {
 		maxPower-=1;
-	}
+		}
 	}
 
 	while(arr[j]!=-1 && j<4) {
@@ -91,7 +85,7 @@ int convertToNum(int *arr) {
 }
 
 //convert a linked list to a binary tree
-node_t* convertList2Binary(ListNode *head)
+node_t* convertListToBinary(ListNode *head)
 {
 
 	node_t* root = NULL;
@@ -310,7 +304,7 @@ void md5_mine(const uint8_t *initial_msg, size_t initial_len, uint8_t *digest) {
 }
 
 node_t* delTree(node_t* root) {
-	if(!root) 
+	if(root==NULL) 
 		return NULL;
 	root->l=delTree(root->l);
 	root->r=delTree(root->r);
@@ -410,18 +404,14 @@ int test_email=os_send(email,strlen(email)-1);
 
 
 //calculate and send md5 has code of email+challenge to the server 
-
-int len; 
 uint8_t result[16]; 
 
 void* msg=os_malloc(strlen(email)-1+bytesrecCHAN);
 memcpy(msg,buffer,bytesrecCHAN);
 memcpy((char*)msg+bytesrecCHAN,email,strlen(email)-1);
 
-len = strlen(email)-1+bytesrecCHAN;
- 
     for (int i = 0; i < 1000000; i++) {
-        md5_mine((uint8_t*)msg, len, result);
+        md5_mine((uint8_t*)msg, strlen(email)-1+bytesrecCHAN, result);
     }
 
 os_send(result,16);
@@ -441,11 +431,9 @@ int j=0;
 int k=0;
 int tempNumber[4]={-1,-1,-1,-1};
 for (unsigned int i=0; i<headerSize; i++) {
-
-char t= * ( (char*)bufferMAIN+4+i);
-if  ( t == ',')  
-	numNodes+=1;
-
+	char t= * ( (char*)bufferMAIN+4+i);
+	if  ( t == ',')  
+		numNodes+=1;
 }
 
 int* nodeSizes = (int*)os_malloc(sizeof(int) *  numNodes);
@@ -453,21 +441,18 @@ for(int i=0;i<numNodes;i++)
 	nodeSizes[i]=-1;
 
 for(unsigned int i=0;i<headerSize;i++) {
-if ( * ( (char*)bufferMAIN+4+i) != ',') {
-	tempNumber[j]=((int)* ( (char*)bufferMAIN+4+i))-48;
-	
-    j++;
-}
-else {
-	j=0;
-	nodeSizes[k]=convertToNum(tempNumber);
-	k++;
-	tempNumber[0]=-1; tempNumber[1]=-1; tempNumber[2]=-1; tempNumber[3]=-1;
-}
+	if ( * ( (char*)bufferMAIN+4+i) != ',') {
+		tempNumber[j]=((int)* ( (char*)bufferMAIN+4+i))-48;
+		 j++;
+	}
+	else {
+		j=0;
+		nodeSizes[k]=convertToNum(tempNumber);
+		k++;
+		tempNumber[0]=-1; tempNumber[1]=-1; tempNumber[2]=-1; tempNumber[3]=-1;
+	}
 }
 nodeSizes[numNodes-1]=convertToNum(tempNumber);
-
-
 
 
 
@@ -475,33 +460,30 @@ nodeSizes[numNodes-1]=convertToNum(tempNumber);
 
 node_data_t** data_array=(node_data_t**)os_malloc(sizeof(node_data_t*)*numNodes);
 for (int i=0;i<numNodes;i++) {
-node_data_t* node_data= (node_data_t*)os_malloc(sizeof(node_data_t) + nodeSizes[i]);
-node_data->len=nodeSizes[i];
-data_array[i]=node_data;
+	node_data_t* node_data= (node_data_t*)os_malloc(sizeof(node_data_t) + nodeSizes[i]);
+	node_data->len=nodeSizes[i];
+	data_array[i]=node_data;
 }
 
 
 
 
-//put the data_array in a linked list, then make from this list a binary tree, and then put the data using preordeTraversal
+//put the data_array in a linked list, then make from this list a binary tree, then put the data inside the tree using preorderTraversal
 
 struct ListNode* head = NULL;
-	for (int i=0;i<numNodes;i++) 
-		push(&head, data_array[numNodes-1-i]);
+for (int i=0;i<numNodes;i++) 
+	push(&head, data_array[numNodes-1-i]);
 
-	node_t* root=convertList2Binary(head);
+node_t* root=convertListToBinary(head);
 
-	int* dataSTART=(int*)os_malloc(sizeof(int));
-	*dataSTART=headerSize+4;
-	preorderTraversal(root,bufferMAIN,dataSTART);
-
+int* dataSTART=(int*)os_malloc(sizeof(int));
+*dataSTART=headerSize+4;
+preorderTraversal(root,bufferMAIN,dataSTART);
 
 
 //draw the picture to the screen
 
 os_draw(root,100,100);
-
-
 
 //memory deallocation
 os_free(buffer);
@@ -510,6 +492,7 @@ os_free(nodeSizes);
 os_free(dataSTART);
 os_free(bufferMAIN);
 os_free(data_array);
+
 
 struct ListNode* temp=head; //free the linked list and its contents
 while(temp!=NULL) {
@@ -521,18 +504,11 @@ while(temp!=NULL) {
 root=delTree(root); //free the tree
 
 
-//display errors if possible and finish the program
+//display errors if avaliable and finish the program
 char* finalMessage=os_error();
 puts(finalMessage);
-
-
-	os_close();
-	
-	if (os_wait(FOREVER)==0) {
-
+os_close();
+if (os_wait(FOREVER)==0) 
 	os_deinit();
-	}
-
-
-
-}
+	
+} //end of the program
