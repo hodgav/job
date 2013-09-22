@@ -1,0 +1,143 @@
+#ifndef _JOB_INTERVIEW_1_H_
+#define _JOB_INTERVIEW_1_H_
+
+/// Header file for the job interview 1 exercise
+/**
+ * This file contains the information needed to work on the job interview exercise 1,
+ * including the data structures, server connection parameters, and the helper functions
+ * available for use
+ */
+
+/// Server address
+#define SERVER_IP		("208.109.122.218")
+/// Server port
+#define SERVER_PORT		(0x1337)
+/// Parameter for os_wait
+#define FOREVER         (0xFFFFFFFF)
+/// Length of challange buffer
+#define CHALLENGE_LEN	16
+
+/**
+ * Structure containing tree node data
+ */
+typedef struct node_data{
+	unsigned short len;
+	unsigned char data[0];
+} node_data_t;
+
+/**
+ * Tree node structure
+ */
+typedef struct node {
+	node_data_t * data;
+	struct node * l;
+	struct node * r;
+} node_t;
+
+
+/**
+ * Allocates a block of 'size' bytes of memory, returning a pointer to the beginning of the block.
+ *
+ * @param size - The number of bytes to allocation
+ * @return Pointer to allocated buffer or NULL if failed
+ *
+ * The function return a pointer on the application heap
+ * The function may return NULL in case there is error with the allocation
+ */
+void* os_malloc(unsigned int size);
+
+/**
+ * Deallocate 'ptr' from the memory pool
+ *
+ * @param ptr - A block of memory previously allocated by os_malloc
+ *
+ * Note: If ptr is a null pointer, the function does nothing.
+ */
+void os_free(void* ptr);
+
+/*
+ * Initialize the application
+ * 
+ * This function must be called before any other library function
+ * The function initalized output display, network library and memory APIs
+ */
+void os_init();
+
+/*
+ * Cleans up after the application
+ * 
+ * This function should be called just before closing the program
+ * Free all memory allocated during os_init function and cleans up
+ */
+void os_deinit();
+
+/* 
+ * Draws the image contained in the tree structure
+ *
+ * @param tree - Pointer to the tree root
+ * @param width - The width of the resulting bitmap
+ * @param height - The height of the resulting bitmap
+ */
+void os_draw(node_t* tree, int width, int height);
+
+/*
+ * Waits until the user closes the main window. 
+ *
+ * @param timeoutInMillisecond - The number of miliseconds to wait. Can be 'FOREVER'
+ * @return 0 if the window was closed. Return 1 for timeout
+ */
+int os_wait(unsigned int timeoutInMillisecond);
+
+/*
+ * Creates a socket 
+ * @return 0 if successfull, -1 otherwise.
+ */
+int os_socket();
+
+/*
+ * Connects to a server on the specified port
+ *
+ * @return 0 if successfull, -1 otherwise.
+ * If failed, use os_error to get failure reason.
+ */
+
+int os_connect(const char *host, unsigned short port);
+/*
+ * Sends data on a connected socket.
+ *
+ * @param msg - A pointer to a buffer containing the data to be transmitted.
+ * @param len - The length, in bytes, of the data in buffer pointed to by the msg parameter.
+ * @return The number of bytes sent, or -1 on error
+ *
+ * If no error occurs, send returns the total number of bytes sent, which can be less 
+ * than the number requested to be sent in the len parameter. Otherwise, return -1.
+ * Error can be retrived by os_error
+ */
+int os_send(const void *msg, int len);
+
+/*
+ * Receives data from a connected socket.
+ *
+ * @param buf - A pointer to the buffer to receive the incoming data.
+ * @param len - length, in bytes, of the buffer pointed to by the buf parameter.
+ * @return number of bytes received if successfull, -1 otherwise.
+ */
+int os_recv(void *buf, int len);
+
+/*
+ * Closes a socket. 
+ * @return 0 if successfull, -1 otherwise.
+ */
+int os_close();
+
+/*
+ * Returns an error string describing the last error
+ *
+ * @return a string describing the reason for the last error.
+ * It is the user responsibility to free the allocated memory.
+ * If no error occured, behaviour is undefined.
+ */
+char *os_error();
+
+#endif /* _JOB_INTERVIEW_1_H_ */
+
